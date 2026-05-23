@@ -149,7 +149,17 @@ document.querySelectorAll(".qr-consult-link").forEach((link) => {
     if (reasonEl) reasonEl.textContent = reason;
     if (offerEl) offerEl.textContent = offer;
 
-    window.quizResult = { method, offer };
+    const hairLabels = { dark: "Тёмные / жёсткие", medium: "Русые / шатен", light: "Светлые / рыжие / седые" };
+    const painLabels = { irritation: "Раздражение и зуд", ingrown: "Вросшие волосы и тёмные точки", fast: "Волосы растут слишком быстро", laser_failed: "Лазер уже пробовала — без результата", none: "Ищу долгосрочный результат" };
+    const goalLabels = { permanent: "Убрать навсегда (системный курс)", quick: "Гладкость за один визит", trial: "Попробовать, оценить комфорт" };
+
+    window.quizResult = {
+      hair: hairLabels[hair] || hair,
+      pain: painLabels[pain] || pain,
+      goal: goalLabels[goal] || goal,
+      method,
+      offer,
+    };
   }
 
 })();

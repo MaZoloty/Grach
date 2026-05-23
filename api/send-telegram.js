@@ -14,7 +14,10 @@ export default async function handler(req, res) {
 
   const quizBlock = quiz
     ? `\n\n🎯 <b>Результат квиза</b>\n` +
-      `Метод: ${quiz.method}\n` +
+      `Цвет волос: ${quiz.hair}\n` +
+      `Проблема: ${quiz.pain}\n` +
+      `Приоритет: ${quiz.goal}\n` +
+      `Рекомендация: ${quiz.method}\n` +
       `Скидка: ${quiz.offer}`
     : '';
 
