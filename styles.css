@@ -1337,11 +1337,13 @@ cite {
   background: rgba(0, 0, 0, 0.18);
   backdrop-filter: blur(2px);
   opacity: 0;
+  pointer-events: none;
   transition: opacity 0.25s ease;
 }
 
 .nav-overlay.is-open {
   opacity: 1;
+  pointer-events: auto;
 }
 
 /* ── Nav drawer ───────────────────────────────── */
