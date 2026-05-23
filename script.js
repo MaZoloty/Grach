@@ -56,7 +56,10 @@ document.querySelectorAll(".qr-consult-link").forEach((link) => {
 
   // Start button
   const startBtn = document.querySelector(".qr-btn-start");
-  if (startBtn) startBtn.addEventListener("click", () => show(1));
+  if (startBtn) startBtn.addEventListener("click", () => {
+    if (typeof ym !== "undefined") ym(109386062, 'reachGoal', 'quiz_start');
+    show(1);
+  });
 
   // Option clicks (event delegation per options group)
   document.querySelectorAll(".qr-options").forEach((group) => {
@@ -153,6 +156,7 @@ document.querySelectorAll(".qr-consult-link").forEach((link) => {
     const painLabels = { irritation: "Раздражение и зуд", ingrown: "Вросшие волосы и тёмные точки", fast: "Волосы растут слишком быстро", laser_failed: "Лазер уже пробовала — без результата", none: "Ищу долгосрочный результат" };
     const goalLabels = { permanent: "Убрать навсегда (системный курс)", quick: "Гладкость за один визит", trial: "Попробовать, оценить комфорт" };
 
+    if (typeof ym !== "undefined") ym(109386062, 'reachGoal', 'quiz_finish');
     window.quizResult = {
       hair: hairLabels[hair] || hair,
       pain: painLabels[pain] || pain,
