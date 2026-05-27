@@ -185,9 +185,9 @@ a {
 
 /* ── Текстовый контейнер (ТЗ) ────────────────── */
 .hero-text-container {
-  padding-left: 8%;
-  padding-right: 5%;
-  max-width: 600px;
+  padding-left: clamp(72px, 10vw, 154px);
+  padding-right: 4%;
+  max-width: 660px;
 }
 
 /* ── Заголовок h1 (ТЗ) ──────────────────────── */
@@ -207,8 +207,7 @@ a {
   position: absolute;
   inset: 0 0 0 auto;
   z-index: 0;
-  /* фото шире — заполняет центр и правую часть */
-  width: 80%;
+  width: 78%;
   min-height: 100%;
   overflow: hidden;
 }
@@ -221,11 +220,11 @@ a {
   /* градиент: плотный слева (под текстом), тает к центру */
   background: linear-gradient(90deg,
     #F7F3EE 0%,
-    rgba(247, 243, 238, 0.97) 4%,
-    rgba(247, 243, 238, 0.78) 14%,
-    rgba(247, 243, 238, 0.38) 26%,
-    rgba(247, 243, 238, 0.08) 38%,
-    transparent 50%
+    rgba(247, 243, 238, 0.95) 7%,
+    rgba(247, 243, 238, 0.70) 18%,
+    rgba(247, 243, 238, 0.30) 30%,
+    rgba(247, 243, 238, 0.06) 42%,
+    transparent 56%
   );
   pointer-events: none;
 }
@@ -235,8 +234,7 @@ a {
   height: 100%;
   min-height: min(860px, 100svh);
   object-fit: cover;
-  /* показываем левую часть фото (растение) в центре, девушек справа */
-  object-position: 8% 18%;
+  object-position: 34% 18%;
 }
 
 .eyebrow {
@@ -495,7 +493,7 @@ main > section {
   border-radius: 16px;
   color: #fff;
   font-size: 13px;
-  max-width: min(560px, calc(100vw - 32px));
+  max-width: min(520px, calc(100vw - 32px));
   box-shadow: 0 8px 32px rgba(0,0,0,0.18);
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
@@ -508,15 +506,17 @@ main > section {
 
 @media (max-width: 768px) {
   .cookie-banner {
-    bottom: 0;
-    left: 0;
-    right: 0;
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
     transform: none;
-    border-radius: 16px 16px 0 0;
-    max-width: 100%;
-    flex-direction: row;
-    padding: 12px 16px;
-    gap: 12px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    border-radius: 16px;
+    max-width: none;
+    width: calc(100% - 20px);
+    padding: 10px 12px;
+    gap: 10px;
   }
 
   .cookie-banner.is-hidden {
@@ -530,6 +530,13 @@ main > section {
   flex: 1;
 }
 
+@media (max-width: 768px) {
+  .cookie-banner p {
+    font-size: 12px;
+    line-height: 1.35;
+  }
+}
+
 .cookie-banner a {
   color: #e8a0b0;
   text-decoration: underline;
@@ -537,7 +544,7 @@ main > section {
 
 .cookie-btn {
   flex-shrink: 0;
-  padding: 8px 18px;
+  padding: 8px 16px;
   background: #B75A70;
   color: #fff;
   border: none;
@@ -2544,5 +2551,120 @@ body {
   .site-header {
     width: calc(100% - 20px) !important;
     max-width: calc(100% - 20px) !important;
+  }
+}
+
+/* ── FAQ refinements ─────────────────────────── */
+.faq-section {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.42), rgba(253, 251, 247, 0.86)),
+    var(--bg);
+}
+
+.faq-section .section-head p:not(.eyebrow) {
+  max-width: 720px;
+  color: var(--muted);
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.faq-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  max-width: 1120px;
+}
+
+.faq-item {
+  border: 1px solid rgba(70, 60, 50, 0.10);
+  border-radius: 18px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.82), rgba(255, 249, 242, 0.72)),
+    #fff;
+  box-shadow: 0 18px 48px rgba(70, 60, 50, 0.07);
+  overflow: hidden;
+}
+
+.faq-item summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 20px 22px;
+  color: var(--ink);
+  font-size: 18px;
+  font-weight: 560;
+}
+
+.faq-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq-item summary::after {
+  content: "+";
+  flex: 0 0 auto;
+  color: var(--rose-dark);
+  font-size: 24px;
+  font-weight: 300;
+  line-height: 1;
+  transition: transform 0.18s ease;
+}
+
+.faq-item[open] summary::after {
+  transform: rotate(45deg);
+}
+
+.faq-item p {
+  margin: 0;
+  padding: 0 22px 22px;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+@media (min-width: 1200px) {
+  .hero-text-container {
+    padding-left: clamp(104px, 11vw, 168px);
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-actions .button {
+    width: min(100%, 280px);
+    max-width: calc(100vw - 64px);
+  }
+
+  .hero-lead {
+    max-width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .faq-list {
+    grid-template-columns: 1fr;
+  }
+
+  .faq-item summary {
+    padding: 18px 18px;
+    font-size: 16px;
+  }
+
+  .faq-item p {
+    padding: 0 18px 18px;
+    font-size: 14px;
+  }
+
+  .cookie-banner {
+    grid-template-columns: 1fr;
+    align-items: center;
+    justify-items: stretch;
+  }
+
+  .cookie-btn {
+    min-width: 48px;
+    min-height: 34px;
+    padding-inline: 14px;
   }
 }
