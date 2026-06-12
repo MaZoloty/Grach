@@ -278,7 +278,11 @@ document.querySelectorAll(".qr-consult-link").forEach((link) => {
     const parts = [];
     if (wax.count) parts.push(`<li><span>Воск / сахар${wax.comboName ? " · " + wax.comboName : ""}</span><b>от ${rub(wax.price)} · ${wax.time} мин</b></li>`);
     if (laser.count) parts.push(`<li><span>Лазер${laser.comboName ? " · " + laser.comboName : ""}</span><b>от ${rub(laser.price)} · ${laser.time} мин</b></li>`);
-    if (electroOn) parts.push(`<li><span>Электроэпиляция</span><b>${rub(electro.price)} · ${electro.time} мин</b></li>`);
+    if (electroOn) {
+      const selectedRate = root.querySelector("input[name='electroType']:checked");
+      const masterLabel = selectedRate && selectedRate.value === "maria" ? "Мария" : "Екатерина";
+      parts.push(`<li><span>Электроэпиляция (${masterLabel})</span><b>${rub(electro.price)} · ${electro.time} мин</b></li>`);
+    }
     if (breakdownEl) breakdownEl.innerHTML = parts.join("");
 
     if (detailsEl) {

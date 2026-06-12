@@ -3593,7 +3593,9 @@ body {
 
 /* Ссылка на калькулятор в первом экране */
 .hero-calc-link {
-  display: inline-block;
+  display: block;
+  flex-basis: 100%;
+  text-align: center;
   margin-top: 14px;
   color: var(--rose-dark);
   font-size: 15px;
