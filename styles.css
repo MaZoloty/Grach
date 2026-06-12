@@ -3590,3 +3590,19 @@ body {
   background: rgba(255, 255, 255, 0.12);
   border-color: rgba(255, 255, 255, 0.5);
 }
+
+/* Ссылка на калькулятор в первом экране */
+.hero-calc-link {
+  display: inline-block;
+  margin-top: 14px;
+  color: var(--rose-dark);
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.hero-calc-link:hover {
+  opacity: 0.72;
+  transform: translateX(2px);
+}
