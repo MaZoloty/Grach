@@ -493,6 +493,79 @@
         <p class="price-note">Цены открыты до записи. Если услуга зависит от зоны или длительности, мастер заранее объяснит расчет и подберет формат без скрытых доплат.</p>
       </section>
 
+      <section class="section cost-calculator" id="calculator" aria-labelledby="calculatorTitle">
+        <div class="calculator-shell">
+          <div class="calculator-copy">
+            <p class="eyebrow">Калькулятор стоимости</p>
+            <h2 id="calculatorTitle">Соберите своё комбо заранее</h2>
+            <p>Отмечайте зоны в любом методе - воск, лазер, электро. Калькулятор запомнит выбор и посчитает общую стоимость и время визита. Для электроэпиляции одноразовая игла - 250 ₽ за визит.</p>
+          </div>
+
+          <div class="calculator-tool" data-cost-calculator>
+            <div class="calculator-tabs" role="tablist" aria-label="Метод процедуры">
+              <button type="button" class="calculator-tab is-active" data-calc-method="wax" role="tab" aria-selected="true">Воск / сахар</button>
+              <button type="button" class="calculator-tab" data-calc-method="laser" role="tab" aria-selected="false">Лазер</button>
+              <button type="button" class="calculator-tab" data-calc-method="electro" role="tab" aria-selected="false">Электро</button>
+            </div>
+
+            <div class="calculator-layout">
+              <div class="calculator-panels">
+                <div class="calculator-panel is-active" data-calc-panel="wax">
+                  <div class="calculator-options">
+                    <label><input type="checkbox" data-zone="face" data-price="550" data-time="10"><span>Зона лица</span><b>550 ₽ · 10 мин</b></label>
+                    <label><input type="checkbox" data-zone="underarms" data-price="750" data-time="10"><span>Подмышки</span><b>от 750 ₽ · 10 мин</b></label>
+                    <label><input type="checkbox" data-zone="bikini-classic" data-price="1400" data-time="15"><span>Бикини классика</span><b>от 1400 ₽ · 15 мин</b></label>
+                    <label><input type="checkbox" data-zone="deep-bikini" data-price="1750" data-time="30"><span>Глубокое бикини</span><b>от 1750 ₽ · 30 мин</b></label>
+                    <label><input type="checkbox" data-zone="shins" data-price="1100" data-time="15"><span>Голени</span><b>от 1100 ₽ · 15 мин</b></label>
+                    <label><input type="checkbox" data-zone="thighs" data-price="1200" data-time="30"><span>Бедра</span><b>от 1200 ₽ · 30 мин</b></label>
+                    <label><input type="checkbox" data-zone="legs-full" data-price="1700" data-time="30"><span>Ноги полностью</span><b>от 1700 ₽ · 30 мин</b></label>
+                    <label><input type="checkbox" data-zone="arms-half" data-price="900" data-time="15"><span>Руки до локтя</span><b>от 900 ₽ · 15 мин</b></label>
+                    <label><input type="checkbox" data-zone="arms-full" data-price="1300" data-time="20"><span>Руки полностью</span><b>от 1300 ₽ · 20 мин</b></label>
+                  </div>
+                </div>
+
+                <div class="calculator-panel" data-calc-panel="laser">
+                  <div class="calculator-options">
+                    <label><input type="checkbox" data-zone="underarms" data-price="1300" data-time="10"><span>Подмышки</span><b>1300 ₽ · 10 мин</b></label>
+                    <label><input type="checkbox" data-zone="bikini-classic" data-price="1550" data-time="15"><span>Бикини классическое</span><b>от 1550 ₽ · 15 мин</b></label>
+                    <label><input type="checkbox" data-zone="deep-bikini" data-price="2700" data-time="30"><span>Глубокое бикини</span><b>от 2700 ₽ · 30 мин</b></label>
+                    <label><input type="checkbox" data-zone="shins" data-price="2300" data-time="30"><span>Голени с коленями</span><b>от 2300 ₽ · 30 мин</b></label>
+                    <label><input type="checkbox" data-zone="legs-full" data-price="3700" data-time="50"><span>Ноги полностью</span><b>3700 ₽ · 50 мин</b></label>
+                    <label><input type="checkbox" data-zone="arms-full" data-price="2500" data-time="40"><span>Руки полностью</span><b>2500 ₽ · 40 мин</b></label>
+                  </div>
+                </div>
+
+                <div class="calculator-panel" data-calc-panel="electro">
+                  <div class="electro-box">
+                    <label class="electro-include"><input type="checkbox" id="electroInclude"><span>Добавить электроэпиляцию к расчёту</span></label>
+                    <fieldset>
+                      <legend>Зона работы</legend>
+                      <label><input type="radio" name="electroType" value="body" data-rate="40" checked><span>Тело</span><b>40 ₽ / мин</b></label>
+                      <label><input type="radio" name="electroType" value="face" data-rate="50"><span>Лицо</span><b>50 ₽ / мин</b></label>
+                    </fieldset>
+                    <label class="minutes-control" for="electroMinutes">
+                      <span>Сколько минут планируете</span>
+                      <input id="electroMinutes" type="number" min="10" max="180" step="10" value="40">
+                    </label>
+                    <p>Одноразовая игла добавляется один раз к визиту: <b>250 ₽</b>.</p>
+                  </div>
+                </div>
+              </div>
+
+              <aside class="calculator-summary" aria-live="polite">
+                <span class="summary-label">Итог по визиту</span>
+                <div class="summary-total" id="calcTotal">0 ₽</div>
+                <div class="summary-time" id="calcTime">Выберите зоны</div>
+                <ul class="summary-breakdown" id="calcBreakdown"></ul>
+                <p id="calcDetails">Отмечайте зоны в любом методе - воск, лазер, электро. Расчёт суммируется по всем. Готовое комбо применяется автоматически.</p>
+                <a class="button primary" href="https://dikidi.net/980738" id="calcBookLink">Записаться онлайн</a>
+                <button type="button" class="calc-reset" id="calcReset" hidden>Сбросить выбор</button>
+              </aside>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- ── Интеллектуальный квиз ── -->
       <section class="qr-section section" id="guide">
         <div class="qr-wrap">

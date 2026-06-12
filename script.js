@@ -168,6 +168,157 @@ document.querySelectorAll(".qr-consult-link").forEach((link) => {
 
 })();
 
+/* ── Cost calculator ─────────────────────────── */
+(function () {
+  const root = document.querySelector("[data-cost-calculator]");
+  if (!root) return;
+
+  const tabs = root.querySelectorAll("[data-calc-method]");
+  const panels = root.querySelectorAll("[data-calc-panel]");
+  const totalEl = document.getElementById("calcTotal");
+  const timeEl = document.getElementById("calcTime");
+  const detailsEl = document.getElementById("calcDetails");
+  const bookLink = document.getElementById("calcBookLink");
+  const minutesInput = document.getElementById("electroMinutes");
+  const electroInclude = document.getElementById("electroInclude");
+  const electroBox = root.querySelector(".electro-box");
+  const breakdownEl = document.getElementById("calcBreakdown");
+  const resetBtn = document.getElementById("calcReset");
+
+  const combos = {
+    wax: [
+      { zones: ["deep-bikini", "underarms"], price: 2300, time: 30, name: "комбо: глубокое бикини + подмышки" },
+      { zones: ["deep-bikini", "underarms", "shins"], price: 3000, time: 40, name: "комбо: глубокое бикини + подмышки + голени" },
+      { zones: ["deep-bikini", "underarms", "legs-full"], price: 3200, time: 55, name: "комбо: глубокое бикини + подмышки + ноги полностью" },
+    ],
+    laser: [
+      { zones: ["deep-bikini", "underarms"], price: 3200, time: 30, name: "комбо 1: глубокое бикини + подмышки" },
+      { zones: ["deep-bikini", "underarms", "shins"], price: 5300, time: 60, name: "комбо 4: глубокое бикини + подмышки + голени" },
+      { zones: ["deep-bikini", "underarms", "legs-full"], price: 6400, time: 90, name: "комбо 5: глубокое бикини + подмышки + ноги полностью" },
+      { zones: ["underarms", "bikini-classic", "deep-bikini", "shins", "legs-full", "arms-full"], price: 9900, time: 120, name: "комбо 6: все включено" },
+    ],
+  };
+
+  let method = "wax";
+
+  const rub = (value) => value.toLocaleString("ru-RU") + " ₽";
+  const min = (value) => value ? value + " мин" : "Выберите зоны";
+
+  function selectedZones(panel) {
+    return Array.from(panel.querySelectorAll("input[type='checkbox']:checked")).map((input) => ({
+      id: input.dataset.zone,
+      price: Number(input.dataset.price),
+      time: Number(input.dataset.time),
+    }));
+  }
+
+  function applyBestCombo(items, methodName) {
+    const base = {
+      price: items.reduce((sum, item) => sum + item.price, 0),
+      time: items.reduce((sum, item) => sum + item.time, 0),
+      comboName: "",
+    };
+    const methodCombos = combos[methodName] || [];
+    const selectedIds = new Set(items.map((item) => item.id));
+    let best = base;
+
+    methodCombos.forEach((combo) => {
+      const fits = combo.zones.every((zone) => selectedIds.has(zone));
+      if (!fits) return;
+      const comboSet = new Set(combo.zones);
+      const rest = items.filter((item) => !comboSet.has(item.id));
+      const candidate = {
+        price: combo.price + rest.reduce((sum, item) => sum + item.price, 0),
+        time: combo.time + rest.reduce((sum, item) => sum + item.time, 0),
+        comboName: combo.name,
+      };
+      if (candidate.price < best.price || (candidate.price === best.price && candidate.time < best.time)) {
+        best = candidate;
+      }
+    });
+
+    return best;
+  }
+
+  function calculateElectro() {
+    const selectedRate = root.querySelector("input[name='electroType']:checked");
+    const rate = selectedRate ? Number(selectedRate.dataset.rate) : 40;
+    const minutes = Math.min(180, Math.max(10, Number(minutesInput?.value || 40)));
+    const needle = 250;
+    return {
+      price: minutes * rate + needle,
+      time: minutes,
+      detail: `${rub(minutes * rate)} за работу + ${rub(needle)} одноразовая игла`,
+    };
+  }
+
+  function methodResult(methodName) {
+    const panel = root.querySelector(`[data-calc-panel="${methodName}"]`);
+    const items = panel ? selectedZones(panel) : [];
+    if (!items.length) return { price: 0, time: 0, count: 0, comboName: "" };
+    const best = applyBestCombo(items, methodName);
+    return { price: best.price, time: best.time, count: items.length, comboName: best.comboName };
+  }
+
+  function update() {
+    const wax = methodResult("wax");
+    const laser = methodResult("laser");
+    const electroOn = !!(electroInclude && electroInclude.checked);
+    const electro = electroOn ? calculateElectro() : { price: 0, time: 0 };
+
+    const totalPrice = wax.price + laser.price + electro.price;
+    const totalTime = wax.time + laser.time + electro.time;
+    const hasZones = wax.count > 0 || laser.count > 0;
+    const anything = hasZones || electroOn;
+
+    if (totalEl) totalEl.textContent = anything ? (hasZones ? "от " : "") + rub(totalPrice) : "0 ₽";
+    if (timeEl) timeEl.textContent = anything ? min(totalTime) : "Выберите зоны";
+    if (electroBox) electroBox.classList.toggle("is-off", !electroOn);
+
+    const parts = [];
+    if (wax.count) parts.push(`<li><span>Воск / сахар${wax.comboName ? " · " + wax.comboName : ""}</span><b>от ${rub(wax.price)} · ${wax.time} мин</b></li>`);
+    if (laser.count) parts.push(`<li><span>Лазер${laser.comboName ? " · " + laser.comboName : ""}</span><b>от ${rub(laser.price)} · ${laser.time} мин</b></li>`);
+    if (electroOn) parts.push(`<li><span>Электроэпиляция</span><b>${rub(electro.price)} · ${electro.time} мин</b></li>`);
+    if (breakdownEl) breakdownEl.innerHTML = parts.join("");
+
+    if (detailsEl) {
+      detailsEl.textContent = anything
+        ? "Итог суммируется по всем методам. Цены «от» мастер уточнит по длине волос и зоне; для электро игла 250 ₽ уже учтена."
+        : "Отмечайте зоны в любом методе - воск, лазер, электро. Расчёт суммируется по всем. Готовое комбо применяется автоматически.";
+    }
+    if (resetBtn) resetBtn.hidden = !anything;
+  }
+
+  tabs.forEach((tab) => {
+    tab.addEventListener("click", () => {
+      method = tab.dataset.calcMethod;
+      tabs.forEach((item) => {
+        const active = item === tab;
+        item.classList.toggle("is-active", active);
+        item.setAttribute("aria-selected", active ? "true" : "false");
+      });
+      panels.forEach((panel) => panel.classList.toggle("is-active", panel.dataset.calcPanel === method));
+      update();
+    });
+  });
+
+  function resetAll() {
+    root.querySelectorAll("input[type='checkbox']").forEach((c) => { c.checked = false; });
+    if (minutesInput) minutesInput.value = 40;
+    update();
+  }
+
+  root.addEventListener("change", update);
+  if (minutesInput) minutesInput.addEventListener("input", update);
+  if (resetBtn) resetBtn.addEventListener("click", resetAll);
+  if (bookLink) {
+    bookLink.addEventListener("click", () => {
+      if (typeof ym !== "undefined") ym(109386062, "reachGoal", "calculator_booking_click");
+    });
+  }
+  update();
+})();
+
 /* ── Standalone consultation form ───────────── */
 (function () {
   function formatPhone(input) {
