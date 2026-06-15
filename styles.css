@@ -1276,6 +1276,18 @@ summary small {
   margin-top: 18px;
 }
 
+.trial-combo-note,
+.calculator-note {
+  margin: 12px 20px 18px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.calculator-note {
+  margin: 12px 2px 0;
+}
+
 .cost-calculator {
   scroll-margin-top: 96px;
   background:
