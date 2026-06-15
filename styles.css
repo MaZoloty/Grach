@@ -1579,6 +1579,117 @@ cite a {
   text-decoration: none;
 }
 
+.reviews-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  align-items: center;
+  margin-top: 22px;
+}
+
+.reviews-actions .reviews-source-link {
+  margin-top: 0;
+}
+
+.reviews-page {
+  background: var(--bg);
+}
+
+.reviews-hero {
+  padding: 150px clamp(20px, 5vw, 72px) 70px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.84), rgba(247, 243, 238, 0.94)),
+    url("/assets/img/studio-equipment.jpg") center 38% / cover;
+  border-bottom: 1px solid var(--line);
+}
+
+.reviews-hero h1 {
+  max-width: 920px;
+  margin: 16px 0;
+  font-size: clamp(42px, 7vw, 86px);
+  line-height: 0.94;
+}
+
+.reviews-lead {
+  max-width: 780px;
+  color: var(--muted);
+  font-size: clamp(17px, 2.2vw, 22px);
+  line-height: 1.55;
+}
+
+.trust-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 28px;
+}
+
+.trust-strip span {
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(70, 60, 50, 0.11);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.trust-strip b {
+  color: var(--ink);
+}
+
+.review-grid-large blockquote {
+  background: var(--surface);
+}
+
+.context-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.context-grid article,
+.facts-panel {
+  padding: 24px;
+  background: var(--surface);
+  border: 1px solid rgba(70, 60, 50, 0.10);
+  border-radius: 20px;
+  box-shadow: 0 18px 40px rgba(48, 43, 39, 0.06);
+}
+
+.context-grid h3 {
+  margin: 0 0 10px;
+  font-size: 20px;
+}
+
+.context-grid p,
+.facts-panel p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.facts-panel {
+  display: grid;
+  gap: 14px;
+  max-width: 980px;
+}
+
+@media (max-width: 1100px) {
+  .context-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+  .reviews-hero {
+    padding-top: 118px;
+  }
+
+  .context-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .contacts {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
