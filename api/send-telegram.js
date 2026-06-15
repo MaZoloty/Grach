@@ -14,11 +14,11 @@ export default async function handler(req, res) {
 
   const quizBlock = quiz
     ? `\n\n🎯 <b>Результат квиза</b>\n` +
-      `Цвет волос: ${quiz.hair}\n` +
+      `Зона старта: ${quiz.zone || quiz.hair}\n` +
       `Проблема: ${quiz.pain}\n` +
       `Приоритет: ${quiz.goal}\n` +
       `Рекомендация: ${quiz.method}\n` +
-      `Скидка: ${quiz.offer}`
+      `Спеццена: ${quiz.offer}`
     : '';
 
   const text =

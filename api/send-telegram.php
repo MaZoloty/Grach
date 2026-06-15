@@ -41,11 +41,11 @@ $quizBlock = '';
 if ($quiz) {
     $quizBlock =
         "\n\n<b>Результат квиза</b>\n" .
-        "Цвет волос: " . escape_html(get_body_value($quiz, 'hair')) . "\n" .
+        "Зона старта: " . escape_html(get_body_value($quiz, 'zone') ? get_body_value($quiz, 'zone') : get_body_value($quiz, 'hair')) . "\n" .
         "Проблема: " . escape_html(get_body_value($quiz, 'pain')) . "\n" .
         "Приоритет: " . escape_html(get_body_value($quiz, 'goal')) . "\n" .
         "Рекомендация: " . escape_html(get_body_value($quiz, 'method')) . "\n" .
-        "Скидка: " . escape_html(get_body_value($quiz, 'offer'));
+        "Спеццена: " . escape_html(get_body_value($quiz, 'offer'));
 }
 
 $text =
