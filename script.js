@@ -235,6 +235,21 @@ document.querySelectorAll(".qr-consult-link").forEach((link) => {
     };
   }
 
+  function trialResult() {
+    const items = Array.from(root.querySelectorAll("input[data-trial-combo]:checked")).map((input) => ({
+      id: input.dataset.trialCombo,
+      price: Number(input.dataset.price),
+      time: Number(input.dataset.time),
+      name: input.dataset.trialCombo === "bikini" ? "Комбо «Бикини»" : "Комбо «Подмышки»",
+    }));
+    return {
+      price: items.reduce((sum, item) => sum + item.price, 0),
+      time: items.reduce((sum, item) => sum + item.time, 0),
+      count: items.length,
+      names: items.map((item) => item.name).join(", "),
+    };
+  }
+
   function methodResult(methodName) {
     const panel = root.querySelector(`[data-calc-panel="${methodName}"]`);
     const items = panel ? selectedZones(panel) : [];
@@ -246,21 +261,24 @@ document.querySelectorAll(".qr-consult-link").forEach((link) => {
   function update() {
     const wax = methodResult("wax");
     const laser = methodResult("laser");
+    const trial = trialResult();
     const electroOn = !!(electroInclude && electroInclude.checked);
     const electro = electroOn ? calculateElectro() : { price: 0, time: 0 };
 
-    const totalPrice = wax.price + laser.price + electro.price;
-    const totalTime = wax.time + laser.time + electro.time;
-    const hasZones = wax.count > 0 || laser.count > 0;
+    const totalPrice = wax.price + laser.price + trial.price + electro.price;
+    const totalTime = wax.time + laser.time + trial.time + electro.time;
+    const hasZones = wax.count > 0 || laser.count > 0 || trial.count > 0;
+    const hasApproxPrice = wax.count > 0 || laser.count > 0;
     const anything = hasZones || electroOn;
 
-    if (totalEl) totalEl.textContent = anything ? (hasZones ? "от " : "") + rub(totalPrice) : "0 ₽";
+    if (totalEl) totalEl.textContent = anything ? (hasApproxPrice ? "от " : "") + rub(totalPrice) : "0 ₽";
     if (timeEl) timeEl.textContent = anything ? min(totalTime) : "Выберите зоны";
     if (electroBox) electroBox.classList.toggle("is-off", !electroOn);
 
     const parts = [];
     if (wax.count) parts.push(`<li><span>Воск / сахар${wax.comboName ? " · " + wax.comboName : ""}</span><b>от ${rub(wax.price)} · ${wax.time} мин</b></li>`);
     if (laser.count) parts.push(`<li><span>Лазер${laser.comboName ? " · " + laser.comboName : ""}</span><b>от ${rub(laser.price)} · ${laser.time} мин</b></li>`);
+    if (trial.count) parts.push(`<li><span>Пробные комбо · ${trial.names}</span><b>${rub(trial.price)} · ${trial.time} мин</b></li>`);
     if (electroOn) {
       const selectedRate = root.querySelector("input[name='electroType']:checked");
       const masterLabel = selectedRate && selectedRate.value === "maria" ? "Мария" : "Екатерина";
