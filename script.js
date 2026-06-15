@@ -115,7 +115,7 @@ document.querySelectorAll(".qr-consult-link").forEach((link) => {
     const goal = answers.q3;
     let method, reason, offer;
 
-    const recommendLaserWax = zone === "laser_wax" || (zone === "unsure" && goal === "permanent" && pain !== "laser_failed");
+    const recommendLaserWax = zone === "legs_full" || (zone === "unsure" && goal === "permanent" && pain !== "laser_failed");
     const recommendBikini = zone === "bikini" || (zone === "unsure" && (pain === "laser_failed" || pain === "fast"));
 
     if (zone === "shins") {
@@ -143,7 +143,7 @@ document.querySelectorAll(".qr-consult-link").forEach((link) => {
     if (reasonEl) reasonEl.textContent = reason;
     if (offerEl) offerEl.textContent = offer;
 
-    const zoneLabels = { bikini: "Бикини", underarms: "Подмышки", shins: "Голени", laser_wax: "Лазер + воск", unsure: "Пока сомневаюсь" };
+    const zoneLabels = { bikini: "Бикини", underarms: "Подмышки", shins: "Голени", legs_full: "Ноги полностью", unsure: "Пока сомневаюсь" };
     const painLabels = { irritation: "Раздражение и зуд", ingrown: "Вросшие волосы и тёмные точки", fast: "Волосы растут слишком быстро", laser_failed: "Лазер уже пробовала — без результата", none: "Ищу долгосрочный результат" };
     const goalLabels = { permanent: "Убрать навсегда (системный курс)", quick: "Гладкость за один визит", trial: "Попробовать, оценить комфорт" };
 
