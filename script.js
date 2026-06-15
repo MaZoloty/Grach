@@ -36,7 +36,7 @@ document.querySelectorAll(".qr-consult-link").forEach((link) => {
 (function () {
   const answers = {};
   let current = 0;
-  const progress = [0, 33, 66, 100, 100, 100];
+  const progress = [0, 25, 50, 75, 100, 100, 100];
 
   const progressBar = document.getElementById("qrProgress");
   const progressFill = document.getElementById("qrFill");
@@ -70,10 +70,10 @@ document.querySelectorAll(".qr-consult-link").forEach((link) => {
         group.querySelectorAll(".qr-option").forEach((b) => b.classList.remove("qr-selected"));
         this.classList.add("qr-selected");
         setTimeout(() => {
-          if (step < 3) {
+          if (step < 4) {
             show(step + 1);
           } else {
-            show(4);
+            show(5);
             runLoader();
           }
         }, 360);
@@ -95,7 +95,7 @@ document.querySelectorAll(".qr-consult-link").forEach((link) => {
     function tick() {
       if (i >= msgs.length) {
         buildResult();
-        show(5);
+        show(6);
         return;
       }
       if (textEl) textEl.style.opacity = "0";
@@ -111,16 +111,21 @@ document.querySelectorAll(".qr-consult-link").forEach((link) => {
 
   function buildResult() {
     const zone = answers.q1;
-    const pain = answers.q2;
-    const goal = answers.q3;
+    const hairType = answers.q2;
+    const pain = answers.q3;
+    const goal = answers.q4;
     let method, reason, offer;
 
-    const recommendLaserWax = zone === "legs_full" || (zone === "unsure" && goal === "permanent" && pain !== "laser_failed");
-    const recommendBikini = zone === "bikini" || (zone === "unsure" && (pain === "laser_failed" || pain === "fast"));
+    const laserAllowed = hairType === "dark" || hairType === "dark_soft";
+    const recommendLaserWax = laserAllowed && (zone === "legs_full" || (zone === "unsure" && goal === "permanent" && pain !== "laser_failed"));
+    const recommendShins = zone === "shins" || (!laserAllowed && zone === "legs_full");
+    const recommendBikini = zone === "bikini" || (zone === "unsure" && (pain === "laser_failed" || pain === "fast" || (!laserAllowed && goal === "permanent")));
 
-    if (zone === "shins") {
+    if (recommendShins) {
       method = "Комбо «Голени»";
-      reason = "Подойдёт, если хочется начать с ног и сразу сравнить два ощущения: 30 минут точечной электроэпиляции и быстрый воск по голеням для гладкости за один визит.";
+      reason = laserAllowed
+        ? "Подойдёт, если хочется начать с ног и сразу сравнить два ощущения: 30 минут точечной электроэпиляции и быстрый воск по голеням для гладкости за один визит."
+        : "Для светлых, рыжих, седых и пушковых волос лазер неэффективен, поэтому лучше начать с электроэпиляции и воска: электро работает с любым цветом волос, а воск даёт гладкость за один визит.";
       offer = "Электро 30 мин + голени воск (1 час · 2550 ₽)";
     } else if (recommendLaserWax) {
       method = "Комбо «Лазер + воск»";
@@ -144,13 +149,15 @@ document.querySelectorAll(".qr-consult-link").forEach((link) => {
     if (offerEl) offerEl.textContent = offer;
 
     const zoneLabels = { bikini: "Бикини", underarms: "Подмышки", shins: "Голени", legs_full: "Ноги полностью", unsure: "Пока сомневаюсь" };
+    const hairTypeLabels = { dark: "Тёмные / плотные", dark_soft: "Тёмные / тонкие", light: "Светлые / рыжие / седые", vellus: "Пушковые / очень тонкие" };
     const painLabels = { irritation: "Раздражение и зуд", ingrown: "Вросшие волосы и тёмные точки", fast: "Волосы растут слишком быстро", laser_failed: "Лазер уже пробовала — без результата", none: "Ищу долгосрочный результат" };
     const goalLabels = { permanent: "Убрать навсегда (системный курс)", quick: "Гладкость за один визит", trial: "Попробовать, оценить комфорт" };
 
     if (typeof ym !== "undefined") ym(109386062, 'reachGoal', 'quiz_finish');
     window.quizResult = {
       zone: zoneLabels[zone] || zone,
-      hair: zoneLabels[zone] || zone,
+      hairType: hairTypeLabels[hairType] || hairType,
+      hair: hairTypeLabels[hairType] || hairType,
       pain: painLabels[pain] || pain,
       goal: goalLabels[goal] || goal,
       method,

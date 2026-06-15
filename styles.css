@@ -2838,29 +2838,29 @@ body {
 }
 
 /* ── Quiz final screen CTA layout ───────────── */
-#qr-5 .qr-result-inner {
+#qr-6 .qr-result-inner {
   text-align: center;
 }
 
-#qr-5 .qr-title,
-#qr-5 .qr-lead,
-#qr-5 .qr-fineprint {
+#qr-6 .qr-title,
+#qr-6 .qr-lead,
+#qr-6 .qr-fineprint {
   margin-right: auto;
   margin-left: auto;
 }
 
-#qr-5 .qr-actions {
+#qr-6 .qr-actions {
   justify-content: center;
   margin: 0 0 16px;
 }
 
-#qr-5 .qr-actions .button {
+#qr-6 .qr-actions .button {
   min-width: min(100%, 240px);
   min-height: 54px;
   border-radius: 999px;
 }
 
-#qr-5 .qr-consult-link {
+#qr-6 .qr-consult-link {
   color: #4a403b;
   background: rgba(255, 255, 255, 0.44);
   border-color: rgba(163, 92, 106, 0.52);
@@ -2868,12 +2868,12 @@ body {
 }
 
 @media (max-width: 640px) {
-  #qr-5 .qr-actions {
+  #qr-6 .qr-actions {
     display: grid;
     grid-template-columns: 1fr;
   }
 
-  #qr-5 .qr-actions .button {
+  #qr-6 .qr-actions .button {
     width: 100%;
   }
 
