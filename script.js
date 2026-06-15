@@ -115,9 +115,18 @@ document.querySelectorAll(".qr-consult-link").forEach((link) => {
     const goal = answers.q3;
     let method, reason, offer;
 
-    const recommendBikini = zone === "bikini" || (zone === "unsure" && (goal === "permanent" || pain === "laser_failed" || pain === "fast"));
+    const recommendLaserWax = zone === "laser_wax" || (zone === "unsure" && goal === "permanent" && pain !== "laser_failed");
+    const recommendBikini = zone === "bikini" || (zone === "unsure" && (pain === "laser_failed" || pain === "fast"));
 
-    if (recommendBikini) {
+    if (zone === "shins") {
+      method = "Комбо «Голени»";
+      reason = "Подойдёт, если хочется начать с ног и сразу сравнить два ощущения: 30 минут точечной электроэпиляции и быстрый воск по голеням для гладкости за один визит.";
+      offer = "Электро 30 мин + голени воск (1 час · 2550 ₽)";
+    } else if (recommendLaserWax) {
+      method = "Комбо «Лазер + воск»";
+      reason = "Подойдёт, если хочется совместить долгосрочную работу лазером с быстрым результатом воска. Екатерина подскажет, какие зоны лучше распределить между методами.";
+      offer = "Лазер + воск (45 мин · 3500 ₽)";
+    } else if (recommendBikini) {
       method = "Комбо «Бикини»";
       reason = "Подойдёт, если хотите начать с чувствительной зоны и сразу понять ощущения от электроэпиляции. Екатерина 30 минут работает электро, а воск помогает завершить визит гладко и без затягивания процедуры.";
       offer = "Электро 30 мин + воск 30 мин (1 час · 3200 ₽)";
@@ -134,7 +143,7 @@ document.querySelectorAll(".qr-consult-link").forEach((link) => {
     if (reasonEl) reasonEl.textContent = reason;
     if (offerEl) offerEl.textContent = offer;
 
-    const zoneLabels = { bikini: "Бикини", underarms: "Подмышки", unsure: "Пока сомневаюсь" };
+    const zoneLabels = { bikini: "Бикини", underarms: "Подмышки", shins: "Голени", laser_wax: "Лазер + воск", unsure: "Пока сомневаюсь" };
     const painLabels = { irritation: "Раздражение и зуд", ingrown: "Вросшие волосы и тёмные точки", fast: "Волосы растут слишком быстро", laser_failed: "Лазер уже пробовала — без результата", none: "Ищу долгосрочный результат" };
     const goalLabels = { permanent: "Убрать навсегда (системный курс)", quick: "Гладкость за один визит", trial: "Попробовать, оценить комфорт" };
 
@@ -236,11 +245,17 @@ document.querySelectorAll(".qr-consult-link").forEach((link) => {
   }
 
   function trialResult() {
+    const trialNames = {
+      bikini: "Комбо «Бикини»",
+      underarms: "Комбо «Подмышки»",
+      shins: "Комбо «Голени»",
+      laser_wax: "Комбо «Лазер + воск»",
+    };
     const items = Array.from(root.querySelectorAll("input[data-trial-combo]:checked")).map((input) => ({
       id: input.dataset.trialCombo,
       price: Number(input.dataset.price),
       time: Number(input.dataset.time),
-      name: input.dataset.trialCombo === "bikini" ? "Комбо «Бикини»" : "Комбо «Подмышки»",
+      name: trialNames[input.dataset.trialCombo] || "Пробное комбо",
     }));
     return {
       price: items.reduce((sum, item) => sum + item.price, 0),
