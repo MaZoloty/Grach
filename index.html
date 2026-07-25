@@ -791,35 +791,49 @@
       <section class="section consultation-section" id="consultation">
         <div class="consultation-copy">
           <p class="eyebrow">Связь со студией</p>
-          <h2>Подберём комфортный первый шаг</h2>
-          <p>Форма обратного звонка временно отключена. Вы по-прежнему можете выбрать время онлайн или позвонить в студию — сайт не будет собирать ваши контактные данные.</p>
+          <h2>Выберите удобный способ связаться</h2>
+          <p>Не нужно оставлять номер и ждать обратного звонка. Позвоните в студию сами или напишите сообщение в группу ВКонтакте.</p>
         </div>
-        <div class="consultation-hold" id="consultationUnavailable">
-          <span class="consultation-status">Форма временно отключена</span>
-          <h3>Запишитесь без передачи данных этому сайту</h3>
-          <p>Расписание и услуги откроются в Dikidi. Для быстрого вопроса можно позвонить напрямую.</p>
-          <div class="consultation-hold-actions">
-            <a class="button primary" href="https://dikidi.net/980738">Открыть онлайн-запись</a>
-            <a class="consultation-phone" href="tel:+79630171769">+7 (963) 017-17-69</a>
+        <div class="consultation-contact-card" id="consultationDirect">
+          <span class="consultation-status">Прямая связь без формы</span>
+          <h3>Мария ответит лично</h3>
+          <p>Выберите способ, который удобнее прямо сейчас. Контактные данные не передаются этому сайту.</p>
+          <div class="consultation-contact-actions">
+            <a class="consultation-choice consultation-choice-phone" href="tel:+79630171769">
+              <span class="consultation-choice-icon" aria-hidden="true">☎</span>
+              <span>
+                <small>Позвонить в студию</small>
+                <strong>+7 (963) 017-17-69</strong>
+              </span>
+            </a>
+            <a class="consultation-choice consultation-choice-vk" href="https://vk.me/timebeautyperm" target="_blank" rel="noopener">
+              <span class="consultation-choice-icon consultation-choice-icon-vk" aria-hidden="true">VK</span>
+              <span>
+                <small>Написать в сообщения</small>
+                <strong>ВКонтакте</strong>
+              </span>
+            </a>
           </div>
         </div>
-        <form class="consultation-form ym-disable-submit" id="consultationForm" hidden>
-          <input class="qr-input ym-disable-keys" type="text" placeholder="Ваше имя" name="name" autocomplete="name" maxlength="80" required>
-          <input class="qr-input ym-disable-keys" type="tel" placeholder="+7 (___) ___-__-__" name="phone" id="consultationPhone" autocomplete="tel" inputmode="tel" required>
-          <div class="form-trap" aria-hidden="true">
-            <label for="consultationWebsite">Не заполняйте это поле</label>
-            <input type="text" id="consultationWebsite" name="website" tabindex="-1" autocomplete="off">
-          </div>
-          <label class="qr-consent">
-            <input type="checkbox" name="consent" required>
-            <span>Я даю отдельное <a href="/consent.html" target="_blank" rel="noopener">согласие на обработку персональных данных</a>.</span>
-          </label>
-          <label class="qr-consent">
-            <input type="checkbox" name="adultConfirmed" required>
-            <span>Мне исполнилось 18 лет, либо я оставляю заявку как законный представитель несовершеннолетнего.</span>
-          </label>
-          <button type="submit" class="button primary consultation-submit">Получить консультацию</button>
-        </form>
+        <template id="consultationFormTemplate">
+          <form class="consultation-form ym-disable-submit" id="consultationForm">
+            <input class="qr-input ym-disable-keys" type="text" placeholder="Ваше имя" name="name" autocomplete="name" maxlength="80" required>
+            <input class="qr-input ym-disable-keys" type="tel" placeholder="+7 (___) ___-__-__" name="phone" id="consultationPhone" autocomplete="tel" inputmode="tel" required>
+            <div class="form-trap" aria-hidden="true">
+              <label for="consultationWebsite">Не заполняйте это поле</label>
+              <input type="text" id="consultationWebsite" name="website" tabindex="-1" autocomplete="off">
+            </div>
+            <label class="qr-consent">
+              <input type="checkbox" name="consent" required>
+              <span>Я даю отдельное <a href="/consent.html" target="_blank" rel="noopener">согласие на обработку персональных данных</a>.</span>
+            </label>
+            <label class="qr-consent">
+              <input type="checkbox" name="adultConfirmed" required>
+              <span>Мне исполнилось 18 лет, либо я оставляю заявку как законный представитель несовершеннолетнего.</span>
+            </label>
+            <button type="submit" class="button primary consultation-submit">Получить консультацию</button>
+          </form>
+        </template>
       </section>
 
       <section class="section contacts" id="contacts">

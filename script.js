@@ -365,13 +365,17 @@ document.querySelectorAll(".qr-consult-link").forEach((link) => {
     input.value = out;
   }
 
-  const form = document.getElementById("consultationForm");
-  const unavailable = document.getElementById("consultationUnavailable");
+  const template = document.getElementById("consultationFormTemplate");
+  const directContact = document.getElementById("consultationDirect");
   const formEnabled = siteConfig.consultationFormEnabled === true;
 
-  if (form) form.hidden = !formEnabled;
-  if (unavailable) unavailable.hidden = formEnabled;
-  if (!form || !formEnabled) return;
+  if (!template || !formEnabled) return;
+
+  const fragment = template.content.cloneNode(true);
+  const form = fragment.querySelector("#consultationForm");
+  if (!form) return;
+  template.before(fragment);
+  if (directContact) directContact.hidden = true;
 
   const phone = document.getElementById("consultationPhone");
   if (phone) {
