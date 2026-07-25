@@ -17,8 +17,8 @@
 
 ## Основные страницы
 
-- Главная: https://www.grach-studio.ru/
-- Отзывы и доверие: https://www.grach-studio.ru/reviews/
-- Блог: https://www.grach-studio.ru/blog/
+- Главная: https://grach-studio.ru/
+- Отзывы и доверие: https://grach-studio.ru/reviews/
+- Блог: https://grach-studio.ru/blog/
 - Онлайн-запись: https://dikidi.net/980738
 - Контакты: Пермь, Парковый, 1/1, 2 этаж, 2 кабинет; +7 963 017-17-69

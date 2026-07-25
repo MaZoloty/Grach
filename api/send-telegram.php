@@ -1,10 +1,25 @@
 <?php
 header('Content-Type: application/json; charset=utf-8');
-header('Access-Control-Allow-Origin: https://www.grach-studio.ru');
+header('Cache-Control: no-store');
+header('X-Content-Type-Options: nosniff');
+
+$allowedOrigins = array(
+    'https://grach-studio.ru',
+    'https://www.grach-studio.ru',
+);
+$origin = isset($_SERVER['HTTP_ORIGIN']) ? (string)$_SERVER['HTTP_ORIGIN'] : '';
+
+if ($origin !== '' && in_array($origin, $allowedOrigins, true)) {
+    header('Access-Control-Allow-Origin: ' . $origin);
+    header('Vary: Origin');
+}
 header('Access-Control-Allow-Methods: POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
+header('Access-Control-Allow-Headers: Content-Type, Accept');
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    if ($origin !== '' && !in_array($origin, $allowedOrigins, true)) {
+        respond(403, false, 'Origin is not allowed');
+    }
     http_response_code(204);
     exit;
 }
@@ -13,21 +28,57 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     respond(405, false, 'Method not allowed');
 }
 
-$config = read_config_file(dirname(dirname(__DIR__)) . '/telegram-config.php');
-$token = getenv('TELEGRAM_BOT_TOKEN') ? getenv('TELEGRAM_BOT_TOKEN') : get_config_value($config, 'TELEGRAM_BOT_TOKEN');
-$chatIds = get_chat_ids($config);
+if ($origin !== '' && !in_array($origin, $allowedOrigins, true)) {
+    respond(403, false, 'Origin is not allowed');
+}
 
-if (!$token || count($chatIds) === 0) {
-    respond(500, false, 'Form is not configured');
+$configPath = dirname(dirname(__DIR__)) . '/telegram-config.php';
+$config = read_config_file($configPath);
+$formEnabled = config_flag('CONSULTATION_FORM_ENABLED', $config);
+
+// Fail closed: without an explicit server-side flag the endpoint never accepts personal data.
+if (!$formEnabled) {
+    respond(503, false, 'Consultation form is temporarily unavailable');
+}
+
+$contentLength = isset($_SERVER['CONTENT_LENGTH']) ? (int)$_SERVER['CONTENT_LENGTH'] : 0;
+if ($contentLength > 16384) {
+    respond(413, false, 'Request is too large');
+}
+
+$token = env_or_config('TELEGRAM_BOT_TOKEN', $config);
+$chatIds = get_chat_ids($config);
+$consentSecret = env_or_config('CONSENT_LOG_SECRET', $config);
+
+if (!$token || count($chatIds) === 0 || strlen($consentSecret) < 32) {
+    respond(500, false, 'Form is not configured safely');
 }
 
 $rawBody = file_get_contents('php://input');
+if ($rawBody === false || strlen($rawBody) > 16384) {
+    respond(413, false, 'Request is too large');
+}
+
 $body = json_decode($rawBody, true);
 if (!is_array($body)) {
     respond(400, false, 'Invalid request');
 }
 
-$name = trim((string)get_body_value($body, 'name'));
+// Honeypot: legitimate visitors never fill this field.
+if (trim((string)get_body_value($body, 'website')) !== '') {
+    respond(200, true, null);
+}
+
+$expectedConsentVersion = '2026-07-25';
+$consentAccepted = get_body_value($body, 'consent') === true;
+$adultConfirmed = get_body_value($body, 'adultConfirmed') === true;
+$consentVersion = trim((string)get_body_value($body, 'consentVersion'));
+
+if (!$consentAccepted || !$adultConfirmed || $consentVersion !== $expectedConsentVersion) {
+    respond(400, false, 'Valid consent is required');
+}
+
+$name = clean_text((string)get_body_value($body, 'name'), 80);
 $phone = normalize_phone((string)get_body_value($body, 'phone'));
 $quiz = isset($body['quiz']) && is_array($body['quiz']) ? $body['quiz'] : null;
 
@@ -35,24 +86,38 @@ if ($name === '' || $phone === '') {
     respond(400, false, 'Name and phone are required');
 }
 
-$name = limit_text($name, 80);
+$privateDir = dirname(dirname(__DIR__)) . '/grach-private-data';
+if (!ensure_private_dir($privateDir)) {
+    respond(500, false, 'Private storage is unavailable');
+}
+
+$clientIp = isset($_SERVER['REMOTE_ADDR']) ? (string)$_SERVER['REMOTE_ADDR'] : 'unknown';
+if (!rate_limit_allows($privateDir, $clientIp, $consentSecret, 5, 900)) {
+    header('Retry-After: 900');
+    respond(429, false, 'Too many requests');
+}
+
+if (!write_consent_record($privateDir, $phone, $clientIp, $consentSecret, $consentVersion)) {
+    respond(500, false, 'Consent record could not be saved');
+}
 
 $quizBlock = '';
 if ($quiz) {
     $quizBlock =
-        "\n\n<b>Результат квиза</b>\n" .
-        "Зона старта: " . escape_html(get_body_value($quiz, 'zone') ? get_body_value($quiz, 'zone') : get_body_value($quiz, 'hair')) . "\n" .
-        "Тип волос: " . escape_html(get_body_value($quiz, 'hairType') ? get_body_value($quiz, 'hairType') : get_body_value($quiz, 'hair')) . "\n" .
-        "Проблема: " . escape_html(get_body_value($quiz, 'pain')) . "\n" .
-        "Приоритет: " . escape_html(get_body_value($quiz, 'goal')) . "\n" .
-        "Рекомендация: " . escape_html(get_body_value($quiz, 'method')) . "\n" .
-        "Спеццена: " . escape_html(get_body_value($quiz, 'offer'));
+        "\n\n<b>Результат цифровой консультации</b>\n" .
+        "Зона старта: " . escape_html(clean_text(get_body_value($quiz, 'zone') ? get_body_value($quiz, 'zone') : get_body_value($quiz, 'hair'), 120)) . "\n" .
+        "Тип волос: " . escape_html(clean_text(get_body_value($quiz, 'hairType') ? get_body_value($quiz, 'hairType') : get_body_value($quiz, 'hair'), 120)) . "\n" .
+        "Проблема: " . escape_html(clean_text(get_body_value($quiz, 'pain'), 120)) . "\n" .
+        "Приоритет: " . escape_html(clean_text(get_body_value($quiz, 'goal'), 120)) . "\n" .
+        "Рекомендация: " . escape_html(clean_text(get_body_value($quiz, 'method'), 120)) . "\n" .
+        "Спеццена: " . escape_html(clean_text(get_body_value($quiz, 'offer'), 120));
 }
 
 $text =
     "<b>Новая заявка с сайта</b>\n\n" .
     "<b>Имя:</b> " . escape_html($name) . "\n" .
-    "<b>Телефон:</b> <a href=\"tel:" . escape_html($phone) . "\">" . escape_html($phone) . "</a>" .
+    "<b>Телефон:</b> <a href=\"tel:" . escape_html($phone) . "\">" . escape_html($phone) . "</a>\n" .
+    "<b>Согласие:</b> версия " . escape_html($consentVersion) .
     $quizBlock;
 
 foreach ($chatIds as $chatId) {
@@ -75,18 +140,25 @@ function get_body_value($body, $key) {
     return isset($body[$key]) ? $body[$key] : '';
 }
 
-function get_config_value($config, $key) {
+function env_or_config($key, $config) {
+    $value = getenv($key);
+    if ($value !== false && $value !== '') {
+        return $value;
+    }
     return isset($config[$key]) ? $config[$key] : '';
+}
+
+function config_flag($key, $config) {
+    $value = strtolower(trim((string)env_or_config($key, $config)));
+    return in_array($value, array('1', 'true', 'yes', 'on'), true);
 }
 
 function get_chat_ids($config) {
     if (isset($config['TELEGRAM_CHAT_IDS']) && is_array($config['TELEGRAM_CHAT_IDS'])) {
-        return $config['TELEGRAM_CHAT_IDS'];
+        return array_values(array_filter($config['TELEGRAM_CHAT_IDS'], 'strlen'));
     }
-    if (isset($config['TELEGRAM_CHAT_ID']) && $config['TELEGRAM_CHAT_ID'] !== '') {
-        return array($config['TELEGRAM_CHAT_ID']);
-    }
-    return array();
+    $chatId = env_or_config('TELEGRAM_CHAT_ID', $config);
+    return $chatId !== '' ? array($chatId) : array();
 }
 
 function read_config_file($path) {
@@ -100,7 +172,12 @@ function read_config_file($path) {
     }
 
     $config = array();
-    foreach (array('TELEGRAM_BOT_TOKEN', 'TELEGRAM_CHAT_ID') as $key) {
+    foreach (array(
+        'CONSULTATION_FORM_ENABLED',
+        'CONSENT_LOG_SECRET',
+        'TELEGRAM_BOT_TOKEN',
+        'TELEGRAM_CHAT_ID',
+    ) as $key) {
         $pattern = "/['\"]" . preg_quote($key, '/') . "['\"]\\s*=>\\s*['\"]([^'\"]+)['\"]/";
         if (preg_match($pattern, $content, $matches)) {
             $config[$key] = $matches[1];
@@ -115,6 +192,62 @@ function read_config_file($path) {
     }
 
     return $config;
+}
+
+function ensure_private_dir($path) {
+    if (is_dir($path)) {
+        return true;
+    }
+    return @mkdir($path, 0700, true) && is_dir($path);
+}
+
+function rate_limit_allows($dir, $ip, $secret, $limit, $windowSeconds) {
+    $key = hash_hmac('sha256', $ip, $secret);
+    $path = $dir . '/rate-' . $key . '.json';
+    $handle = @fopen($path, 'c+');
+    if (!$handle || !flock($handle, LOCK_EX)) {
+        if ($handle) fclose($handle);
+        return false;
+    }
+
+    $raw = stream_get_contents($handle);
+    $events = $raw ? json_decode($raw, true) : array();
+    if (!is_array($events)) $events = array();
+
+    $now = time();
+    $recent = array();
+    foreach ($events as $event) {
+        if ((int)$event > $now - $windowSeconds) {
+            $recent[] = (int)$event;
+        }
+    }
+
+    $allowed = count($recent) < $limit;
+    if ($allowed) $recent[] = $now;
+
+    rewind($handle);
+    ftruncate($handle, 0);
+    fwrite($handle, json_encode($recent));
+    fflush($handle);
+    flock($handle, LOCK_UN);
+    fclose($handle);
+
+    return $allowed;
+}
+
+function write_consent_record($dir, $phone, $ip, $secret, $version) {
+    $userAgent = isset($_SERVER['HTTP_USER_AGENT']) ? (string)$_SERVER['HTTP_USER_AGENT'] : '';
+    $record = array(
+        'createdAt' => gmdate('c'),
+        'source' => 'website_consultation',
+        'consentVersion' => $version,
+        'phoneHash' => hash_hmac('sha256', $phone, $secret),
+        'ipHash' => hash_hmac('sha256', $ip, $secret),
+        'userAgentHash' => hash_hmac('sha256', $userAgent, $secret),
+    );
+
+    $line = json_encode($record, JSON_UNESCAPED_UNICODE) . "\n";
+    return file_put_contents($dir . '/consent-log.ndjson', $line, FILE_APPEND | LOCK_EX) !== false;
 }
 
 function send_to_telegram($token, $payload) {
@@ -162,7 +295,9 @@ function normalize_phone($value) {
     return '';
 }
 
-function limit_text($value, $length) {
+function clean_text($value, $length) {
+    $value = trim((string)$value);
+    $value = preg_replace('/[\x00-\x1F\x7F]+/u', ' ', $value);
     return function_exists('mb_substr') ? mb_substr($value, 0, $length, 'UTF-8') : substr($value, 0, $length);
 }
 

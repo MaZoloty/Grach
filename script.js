@@ -1,3 +1,5 @@
+const siteConfig = window.GrachSiteConfig || {};
+
 /* ── Header scroll state ─────────────────────── */
 (function () {
   const header = document.querySelector(".site-header");
@@ -363,6 +365,14 @@ document.querySelectorAll(".qr-consult-link").forEach((link) => {
     input.value = out;
   }
 
+  const form = document.getElementById("consultationForm");
+  const unavailable = document.getElementById("consultationUnavailable");
+  const formEnabled = siteConfig.consultationFormEnabled === true;
+
+  if (form) form.hidden = !formEnabled;
+  if (unavailable) unavailable.hidden = formEnabled;
+  if (!form || !formEnabled) return;
+
   const phone = document.getElementById("consultationPhone");
   if (phone) {
     phone.addEventListener("input", function () {
@@ -370,48 +380,61 @@ document.querySelectorAll(".qr-consult-link").forEach((link) => {
     });
   }
 
-  const form = document.getElementById("consultationForm");
-  if (form) {
-    form.addEventListener("submit", async function (event) {
-      event.preventDefault();
-      const name = this.name.value.trim();
-      const phoneValue = this.phone.value.trim();
-      const btn = this.querySelector("button[type=submit]");
-      if (btn) { btn.disabled = true; btn.textContent = "Отправляем…"; }
+  form.addEventListener("submit", async function (event) {
+    event.preventDefault();
+    const name = this.name.value.trim();
+    const phoneValue = this.phone.value.trim();
+    const consentAccepted = this.consent.checked;
+    const adultConfirmed = this.adultConfirmed.checked;
+    const website = this.website.value.trim();
+    const btn = this.querySelector("button[type=submit]");
+    if (!consentAccepted || !adultConfirmed) return;
+    if (btn) { btn.disabled = true; btn.textContent = "Отправляем…"; }
 
-      try {
-        if (typeof ym !== "undefined") ym(109386062, 'reachGoal', 'consultation_submit');
-        const response = await fetch("/api/send-telegram.php", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name,
-            phone: phoneValue,
-            quiz: window.quizResult || null,
-          }),
-        });
+    try {
+      const response = await fetch("/api/send-telegram.php", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          phone: phoneValue,
+          website,
+          consent: consentAccepted,
+          consentVersion: siteConfig.consentVersion || "",
+          adultConfirmed,
+          quiz: window.quizResult || null,
+        }),
+      });
 
-        const data = await response.json().catch(() => null);
-        if (!response.ok || !data?.ok) {
-          throw new Error(data?.error || "Не удалось отправить заявку");
-        }
-      } catch (_) {
-        if (btn) {
-          btn.disabled = false;
-          btn.textContent = "Получить консультацию";
-        }
-        alert("Не удалось отправить заявку. Пожалуйста, напишите нам в сообщения сообщества или попробуйте позже.");
-        return;
+      const data = await response.json().catch(() => null);
+      if (!response.ok || !data?.ok) {
+        throw new Error(data?.error || "Не удалось отправить заявку");
       }
+      if (typeof ym !== "undefined") ym(109386062, "reachGoal", "consultation_submit");
+    } catch (_) {
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = "Получить консультацию";
+      }
+      alert("Форма сейчас недоступна. Пожалуйста, воспользуйтесь онлайн-записью или позвоните в студию.");
+      return;
+    }
 
-      this.innerHTML = `
-        <div class="qr-success">
-          <div class="qr-success-check">✓</div>
-          <h3>Спасибо, ${name}!</h3>
-          <p>Мы свяжемся с вами по номеру ${phoneValue} и поможем выбрать первый комфортный шаг.</p>
-        </div>`;
-    });
-  }
+    const success = document.createElement("div");
+    success.className = "qr-success";
+    const check = document.createElement("div");
+    check.className = "qr-success-check";
+    check.textContent = "✓";
+    const heading = document.createElement("h3");
+    heading.textContent = `Спасибо, ${name}!`;
+    const message = document.createElement("p");
+    message.textContent = `Мы свяжемся с вами по номеру ${phoneValue} и поможем выбрать первый комфортный шаг.`;
+    success.append(check, heading, message);
+    this.replaceChildren(success);
+  });
 })();
 
 /* ── Nav drawer ───────────────────────────────── */
@@ -451,16 +474,82 @@ document.querySelectorAll(".qr-consult-link").forEach((link) => {
 
 /* ── Cookie banner ───────────────────────────── */
 (function () {
+  const STORAGE_KEY = "grach_analytics_consent_v2";
   const banner = document.getElementById("cookieBanner");
-  const btn = document.getElementById("cookieAccept");
-  if (!banner || !btn) return;
-  if (localStorage.getItem("cookie_ok")) {
-    banner.classList.add("is-hidden");
-    return;
+  const accept = document.getElementById("cookieAccept");
+  const decline = document.getElementById("cookieDecline");
+  const settingsButtons = document.querySelectorAll("[data-cookie-settings]");
+  const metrikaId = Number(siteConfig.metrikaId || 109386062);
+
+  const storage = {
+    get() {
+      try { return localStorage.getItem(STORAGE_KEY); } catch (_) { return null; }
+    },
+    set(value) {
+      try {
+        localStorage.removeItem("cookie_ok");
+        localStorage.setItem(STORAGE_KEY, value);
+      } catch (_) {}
+    },
+  };
+
+  function loadMetrika() {
+    if (!metrikaId || window.__grachMetrikaLoaded) return;
+    window.__grachMetrikaLoaded = true;
+    window.ym = window.ym || function () {
+      (window.ym.a = window.ym.a || []).push(arguments);
+    };
+    window.ym.l = Date.now();
+
+    const script = document.createElement("script");
+    script.async = true;
+    script.src = `https://mc.yandex.ru/metrika/tag.js?id=${metrikaId}`;
+    document.head.appendChild(script);
+
+    window.ym(metrikaId, "init", {
+      clickmap: true,
+      trackLinks: true,
+      accurateTrackBounce: true,
+      webvisor: true,
+    });
   }
-  btn.addEventListener("click", () => {
-    localStorage.setItem("cookie_ok", "1");
+
+  function showBanner() {
+    if (!banner) return;
+    banner.hidden = false;
+    banner.classList.remove("is-hidden");
+  }
+
+  function hideBanner() {
+    if (!banner) return;
     banner.classList.add("is-hidden");
+    window.setTimeout(() => { banner.hidden = true; }, 320);
+  }
+
+  function choose(value) {
+    const wasLoaded = window.__grachMetrikaLoaded === true;
+    storage.set(value);
+    hideBanner();
+    if (value === "granted") {
+      loadMetrika();
+    } else if (wasLoaded) {
+      window.location.reload();
+    }
+  }
+
+  const current = storage.get();
+  if (current === "granted") loadMetrika();
+  if (!current) showBanner();
+
+  if (accept) accept.addEventListener("click", () => choose("granted"));
+  if (decline) decline.addEventListener("click", () => choose("denied"));
+  settingsButtons.forEach((button) => {
+    button.addEventListener("click", showBanner);
+  });
+
+  window.GrachAnalytics = Object.freeze({
+    showSettings: showBanner,
+    consent: () => storage.get(),
   });
 })();
 

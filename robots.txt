@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://www.grach-studio.ru/sitemap.xml
+Sitemap: https://grach-studio.ru/sitemap.xml
