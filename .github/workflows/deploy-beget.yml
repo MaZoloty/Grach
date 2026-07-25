@@ -25,7 +25,8 @@ jobs:
           username: ${{ secrets.BEGET_FTP_USERNAME }}
           password: ${{ secrets.BEGET_FTP_PASSWORD }}
           local-dir: ./
-          server-dir: /grach-studio.ru/public_html/
+          # This FTP account is already restricted to grach-studio.ru/public_html.
+          server-dir: ./
           exclude: |
             **/.git*
             **/.git*/**
