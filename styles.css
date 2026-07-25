@@ -1844,6 +1844,32 @@ cite a {
   text-decoration: none;
 }
 
+.footer-legal-links {
+  display: flex;
+  flex: 0 0 100%;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 20px;
+  padding-top: 4px;
+}
+
+.footer-legal-links a,
+.footer-legal-links button {
+  padding: 0;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid rgba(98, 88, 80, 0.22);
+  font: inherit;
+  cursor: pointer;
+}
+
+.footer-legal-links a:hover,
+.footer-legal-links button:hover {
+  color: var(--ink);
+  border-bottom-color: rgba(98, 88, 80, 0.48);
+}
+
 .mobile-bar {
   position: fixed;
   right: 0;

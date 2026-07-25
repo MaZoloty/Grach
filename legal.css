@@ -154,10 +154,36 @@ body.legal-page {
 }
 
 .legal-footer {
+  display: grid;
+  gap: 10px;
   margin-top: 24px;
   color: var(--legal-muted);
   font-size: 13px;
   text-align: center;
+}
+
+.legal-footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 18px;
+}
+
+.legal-footer-links a,
+.legal-footer-links button {
+  padding: 0;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid rgba(98, 88, 80, 0.22);
+  font: inherit;
+  cursor: pointer;
+}
+
+.legal-footer-links a:hover,
+.legal-footer-links button:hover {
+  color: var(--legal-ink);
+  border-bottom-color: rgba(98, 88, 80, 0.48);
 }
 
 .legal-page .cookie-banner {
