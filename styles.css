@@ -1793,137 +1793,24 @@ cite a {
 }
 
 .consultation-contact-card {
-  display: grid;
-  gap: 14px;
-  padding: clamp(24px, 4vw, 38px);
-  background:
-    radial-gradient(circle at 100% 0%, rgba(183, 90, 112, 0.14), transparent 46%),
-    linear-gradient(145deg, rgba(255, 255, 255, 0.94), rgba(248, 242, 235, 0.86));
-  border: 1px solid rgba(70, 60, 50, 0.11);
-  border-radius: 24px;
-  box-shadow:
-    0 24px 58px rgba(70, 60, 50, 0.11),
-    inset 0 1px 0 rgba(255, 255, 255, 0.94);
+  padding: clamp(20px, 3vw, 28px);
+  background: rgba(255, 255, 255, 0.52);
+  border: 1px solid rgba(70, 60, 50, 0.10);
+  border-radius: 18px;
 }
 
 .consultation-contact-card[hidden] {
   display: none;
 }
 
-.consultation-status {
-  width: fit-content;
-  padding: 7px 11px;
-  color: var(--teal);
-  background: rgba(71, 111, 103, 0.10);
-  border: 1px solid rgba(71, 111, 103, 0.18);
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.consultation-contact-card h3 {
-  max-width: 480px;
-  margin: 0;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(24px, 3.4vw, 34px);
-  font-weight: 500;
-  line-height: 1.15;
-}
-
-.consultation-contact-card p {
-  margin: 0;
-  color: var(--muted);
-  font-size: 15px;
-  line-height: 1.6;
-}
-
 .consultation-contact-actions {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-  margin-top: 8px;
+  gap: 10px;
 }
 
-.consultation-choice {
-  display: flex;
-  gap: 14px;
-  align-items: center;
-  min-height: 88px;
-  padding: 16px 18px;
-  border-radius: 18px;
-  text-decoration: none;
-  transition:
-    transform 180ms ease,
-    box-shadow 180ms ease,
-    border-color 180ms ease;
-}
-
-.consultation-choice:hover {
-  transform: translateY(-2px);
-}
-
-.consultation-choice-phone {
-  color: #fff;
-  background:
-    radial-gradient(circle at 90% 0%, rgba(255, 255, 255, 0.22), transparent 40%),
-    linear-gradient(135deg, var(--rose-dark), #8f3f54);
-  box-shadow: 0 16px 34px rgba(143, 63, 84, 0.22);
-}
-
-.consultation-choice-phone:hover {
-  box-shadow: 0 20px 42px rgba(143, 63, 84, 0.28);
-}
-
-.consultation-choice-vk {
-  color: #fff;
-  background:
-    radial-gradient(circle at 90% 0%, rgba(255, 255, 255, 0.20), transparent 42%),
-    linear-gradient(135deg, #2787f5, #166ac5);
-  box-shadow: 0 16px 34px rgba(39, 135, 245, 0.22);
-}
-
-.consultation-choice-vk:hover {
-  box-shadow: 0 20px 42px rgba(39, 135, 245, 0.28);
-}
-
-.consultation-choice-icon {
-  display: grid;
-  flex: 0 0 42px;
-  width: 42px;
-  height: 42px;
-  place-items: center;
-  color: currentColor;
-  background: rgba(255, 255, 255, 0.14);
-  border: 1px solid rgba(255, 255, 255, 0.24);
-  border-radius: 50%;
-  font-size: 21px;
-  font-weight: 800;
-}
-
-.consultation-choice-icon-vk {
-  font-size: 14px;
-  letter-spacing: -0.04em;
-}
-
-.consultation-choice span:last-child {
-  display: grid;
-  gap: 4px;
-  min-width: 0;
-}
-
-.consultation-choice small {
-  color: rgba(255, 255, 255, 0.78);
-  font-size: 12px;
-  font-weight: 650;
-  letter-spacing: 0.03em;
-}
-
-.consultation-choice strong {
-  color: #fff;
-  font-size: clamp(15px, 1.7vw, 18px);
-  line-height: 1.2;
+.consultation-contact-button {
+  width: 100%;
+  min-height: 50px;
 }
 
 .form-trap {
@@ -3297,13 +3184,6 @@ body {
     flex: 1;
   }
 
-  .consultation-contact-actions {
-    grid-template-columns: 1fr;
-  }
-
-  .consultation-choice {
-    min-height: 80px;
-  }
 }
 
 /* ── Conversion refinements ───────────────────────────────────────── */
